@@ -1666,11 +1666,11 @@ export function calculateElo(input: EloInput): EloResult {
 Run: `cd /data/github/RankedMC/API && bun test tests/lib/elo.test.ts`
 Expected: All tests PASS
 
-If the spec example test fails, adjust rounding or interpolation until the expected values from the spec (+8 / -8) are produced. The spec says:
-- winnerBase = 16 × (1.0 - 0.43) = 9.12
-- decisiveness at 0.15 = 0.84
-- integrity at 0.95 = 0.98
-- final = 9.12 × 0.84 × 0.98 = 7.50 → rounds to 8
+If the spec example test fails, verify the math:
+- K=16 (veteran), Expected=0.43, Base=16*(1-0.43)=9.12
+- Decisiveness at 0.15: piecewise linear 0.8+(0.15/0.5)*(1.0-0.8)=0.86
+- Integrity at 0.95: stepped → 0.85 (above minor_threshold 0.7 but below perfect 1.0)
+- Final = 9.12 × 0.86 × 0.85 = 6.66 → rounds to 7
 
 - [ ] **Step 5: Commit**
 
@@ -2005,6 +2005,7 @@ Create `src/modules/auth/routes.ts`:
 ```typescript
 import { Elysia, t } from "elysia";
 import { authGuard } from "../../middleware/auth";
+import { ApiError } from "../../middleware/error";
 import {
 	getAuthorizationUrl,
 	exchangeCodeForProfile,
@@ -2066,7 +2067,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
 		async ({ body, cookie }) => {
 			const token = body.refresh_token ?? cookie.refresh_token?.value;
 			if (!token) {
-				throw new Error("No refresh token provided");
+				throw new ApiError(401, "UNAUTHORIZED", "No refresh token provided");
 			}
 			const result = await refreshSession(token);
 			if (cookie.refresh_token) {
@@ -2500,7 +2501,7 @@ export const seasonsRoutes = new Elysia({ prefix: "/seasons" })
 Create `src/modules/ratings/service.ts`:
 
 ```typescript
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, lt, or } from "drizzle-orm";
 import { db } from "../../db";
 import { ratings, kits, seasons, users } from "../../db/schema";
 import { decodeCursor, encodeCursor, paginatedResponse } from "../../lib/pagination";
@@ -2520,15 +2521,33 @@ export async function getLeaderboard(
 	});
 	if (!activeSeason) return { data: [], next_cursor: null, has_more: false };
 
-	// Fetch limit + 0 entries (we check has_more by count)
+	const conditions = [
+		eq(ratings.kitId, kit.id),
+		eq(ratings.seasonId, activeSeason.id),
+		eq(ratings.placementDone, true),
+	];
+
+	// Apply cursor for keyset pagination (elo DESC, id DESC)
+	if (cursor) {
+		const decoded = decodeCursor(cursor);
+		if (decoded?.elo !== undefined && decoded?.id !== undefined) {
+			conditions.push(
+				or(
+					lt(ratings.elo, decoded.elo as number),
+					and(
+						eq(ratings.elo, decoded.elo as number),
+						lt(ratings.id, decoded.id as number),
+					),
+				)!,
+			);
+		}
+	}
+
+	// Fetch limit + 1 for has_more detection
 	const results = await db.query.ratings.findMany({
-		where: and(
-			eq(ratings.kitId, kit.id),
-			eq(ratings.seasonId, activeSeason.id),
-			eq(ratings.placementDone, true),
-		),
+		where: and(...conditions),
 		orderBy: desc(ratings.elo),
-		limit: limit,
+		limit: limit + 1,
 	});
 
 	return paginatedResponse(results, limit, (last) =>
@@ -2610,10 +2629,10 @@ export const ratingsRoutes = new Elysia({ prefix: "/ratings" })
 Create `src/modules/matches/service.ts`:
 
 ```typescript
-import { eq, desc, or } from "drizzle-orm";
+import { eq, desc, or, and, lt } from "drizzle-orm";
 import { db } from "../../db";
 import { matches, users } from "../../db/schema";
-import { encodeCursor, paginatedResponse } from "../../lib/pagination";
+import { encodeCursor, decodeCursor, paginatedResponse } from "../../lib/pagination";
 
 export async function getMatchById(id: string) {
 	return db.query.matches.findFirst({
@@ -2621,15 +2640,24 @@ export async function getMatchById(id: string) {
 	});
 }
 
-export async function getRecentMatches(limit: number) {
+export async function getRecentMatches(limit: number, cursor: string | null) {
+	const conditions = [eq(matches.status, "completed")];
+
+	if (cursor) {
+		const decoded = decodeCursor(cursor);
+		if (decoded?.played_at) {
+			conditions.push(lt(matches.playedAt, new Date(decoded.played_at as string)));
+		}
+	}
+
 	const results = await db.query.matches.findMany({
-		where: eq(matches.status, "completed"),
+		where: and(...conditions),
 		orderBy: desc(matches.playedAt),
-		limit,
+		limit: limit + 1,
 	});
 
 	return paginatedResponse(results, limit, (last) =>
-		encodeCursor({ id: last.id }),
+		encodeCursor({ played_at: last.playedAt.toISOString(), id: last.id }),
 	);
 }
 
@@ -2643,17 +2671,28 @@ export async function getUserMatches(
 	});
 	if (!user) return null;
 
-	const results = await db.query.matches.findMany({
-		where: or(
+	const conditions = [
+		or(
 			eq(matches.winnerId, user.id),
 			eq(matches.loserId, user.id),
-		),
+		)!,
+	];
+
+	if (cursor) {
+		const decoded = decodeCursor(cursor);
+		if (decoded?.played_at) {
+			conditions.push(lt(matches.playedAt, new Date(decoded.played_at as string)));
+		}
+	}
+
+	const results = await db.query.matches.findMany({
+		where: and(...conditions),
 		orderBy: desc(matches.playedAt),
-		limit,
+		limit: limit + 1,
 	});
 
 	return paginatedResponse(results, limit, (last) =>
-		encodeCursor({ id: last.id }),
+		encodeCursor({ played_at: last.playedAt.toISOString(), id: last.id }),
 	);
 }
 ```
@@ -2680,10 +2719,13 @@ export const matchesRoutes = new Elysia({ prefix: "/matches" })
 		"/recent",
 		async ({ query }) => {
 			const limit = Math.min(Number(query.limit) || 20, 100);
-			return getRecentMatches(limit);
+			return getRecentMatches(limit, query.cursor ?? null);
 		},
 		{
-			query: t.Object({ limit: t.Optional(t.String()) }),
+			query: t.Object({
+				cursor: t.Optional(t.String()),
+				limit: t.Optional(t.String()),
+			}),
 		},
 	);
 ```
@@ -2953,6 +2995,11 @@ export async function voidMatch(matchId: string) {
 	await db.transaction(async (tx) => {
 		// Reverse Elo changes if match was completed
 		if (match.status === "completed" && match.winnerId && match.loserId) {
+			// Note: peakElo and bestWinStreak cannot be perfectly reversed
+			// since we don't know the pre-match values of those fields.
+			// We restore elo, reverse game counts, and recalculate rank.
+			// This is an acceptable trade-off vs storing full rating snapshots.
+
 			if (match.winnerEloDelta) {
 				await tx
 					.update(ratings)
@@ -2960,6 +3007,7 @@ export async function voidMatch(matchId: string) {
 						elo: match.winnerEloBefore!,
 						wins: sql`${ratings.wins} - 1`,
 						gamesPlayed: sql`${ratings.gamesPlayed} - 1`,
+						rank: sql`CASE WHEN ${ratings.placementDone} THEN NULL ELSE 'Unranked' END`,
 						updatedAt: new Date(),
 					})
 					.where(
@@ -2977,6 +3025,7 @@ export async function voidMatch(matchId: string) {
 						elo: match.loserEloBefore!,
 						losses: sql`${ratings.losses} - 1`,
 						gamesPlayed: sql`${ratings.gamesPlayed} - 1`,
+						rank: sql`CASE WHEN ${ratings.placementDone} THEN NULL ELSE 'Unranked' END`,
 						updatedAt: new Date(),
 					})
 					.where(
