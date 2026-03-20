@@ -12,7 +12,10 @@ export class ApiError extends Error {
 }
 
 export const errorHandler = new Elysia({ name: "error-handler" })
-	.onError(({ error, set }) => {
+	.onError(({ error, set, code }) => {
+		// Let Elysia handle validation errors natively (422)
+		if (code === "VALIDATION") return;
+
 		if (error instanceof ApiError) {
 			set.status = error.status;
 			return {
