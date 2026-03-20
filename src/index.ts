@@ -1,6 +1,7 @@
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { Elysia } from "elysia";
+import { config } from "./config";
 
 const app = new Elysia()
 	.use(cors())
@@ -18,7 +19,7 @@ const app = new Elysia()
 		}),
 	)
 	.get("/health", () => ({ status: "ok" }))
-	.listen(Number(process.env.PORT) || 3000);
+	.listen(config.port);
 
 console.log(
 	`RankedMC API running at ${app.server?.hostname}:${app.server?.port}`,
