@@ -12,6 +12,7 @@ import { matchesRoutes } from "./modules/matches/routes";
 import { punishmentsRoutes } from "./modules/punishments/routes";
 import { internalRoutes } from "./modules/internal/routes";
 import { rateLimiter } from "./middleware/rateLimit";
+import { runDecay } from "./lib/decay";
 
 const app = new Elysia()
 	.use(errorHandler)
@@ -49,5 +50,19 @@ const app = new Elysia()
 console.log(
 	`RankedMC API running at ${app.server?.hostname}:${app.server?.port}`,
 );
+
+// Run decay daily at 00:00 UTC
+// Bun doesn't have native cron, use setInterval for MVP
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+setInterval(async () => {
+	try {
+		await runDecay();
+	} catch (err) {
+		console.error("Decay job failed:", err);
+	}
+}, TWENTY_FOUR_HOURS);
+
+// Also run on startup to catch up
+runDecay().catch((err) => console.error("Initial decay run failed:", err));
 
 export type App = typeof app;
