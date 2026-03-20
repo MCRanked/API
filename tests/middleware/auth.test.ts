@@ -8,7 +8,7 @@ describe("authGuard", () => {
 	const app = new Elysia()
 		.use(errorHandler)
 		.use(authGuard)
-		.get("/protected", ({ store }) => ({ uuid: store.user.sub }));
+		.get("/protected", ({ user }) => ({ uuid: user.sub }));
 
 	test("rejects requests without Authorization header", async () => {
 		const res = await app.handle(new Request("http://localhost/protected"));
