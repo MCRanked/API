@@ -10,6 +10,7 @@ import {
 	deleteLoadout,
 } from "./service";
 import { ApiError } from "../../middleware/error";
+import { getUserMatches } from "../matches/service";
 
 export const usersRoutes = new Elysia({ prefix: "/users" })
 	// Public routes
@@ -30,6 +31,22 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
 			return result;
 		},
 		{ params: t.Object({ uuid: t.String() }) },
+	)
+	.get(
+		"/:uuid/matches",
+		async ({ params, query }) => {
+			const limit = Math.min(Number(query.limit) || 20, 100);
+			const result = await getUserMatches(params.uuid, limit, query.cursor ?? null);
+			if (result === null) throw new ApiError(404, "NOT_FOUND", "User not found");
+			return result;
+		},
+		{
+			params: t.Object({ uuid: t.String() }),
+			query: t.Object({
+				cursor: t.Optional(t.String()),
+				limit: t.Optional(t.String()),
+			}),
+		},
 	)
 	// Authenticated routes
 	.use(authGuard)
