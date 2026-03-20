@@ -11,6 +11,7 @@ import { ratingsRoutes } from "./modules/ratings/routes";
 import { matchesRoutes } from "./modules/matches/routes";
 import { punishmentsRoutes } from "./modules/punishments/routes";
 import { internalRoutes } from "./modules/internal/routes";
+import { rateLimiter } from "./middleware/rateLimit";
 
 const app = new Elysia()
 	.use(errorHandler)
@@ -32,6 +33,7 @@ const app = new Elysia()
 	// Public API
 	.group("/api/v1", (app) =>
 		app
+			.use(rateLimiter({ max: 60, windowMs: 60000 }))
 			.use(authRoutes)
 			.use(usersRoutes)
 			.use(kitsRoutes)
