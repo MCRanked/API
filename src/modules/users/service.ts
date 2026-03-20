@@ -1,6 +1,6 @@
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../../db";
-import { users, ratings, playerLoadouts, kits } from "../../db/schema";
+import { kits, playerLoadouts, ratings, users } from "../../db/schema";
 import { ApiError } from "../../middleware/error";
 
 export async function getUserByUuid(minecraftUuid: string) {
@@ -37,11 +37,16 @@ export async function getUserById(userId: string) {
 
 export async function updatePreferences(
 	userId: string,
-	prefs: { language?: string; version_preference?: string; preferences?: Record<string, unknown> },
+	prefs: {
+		language?: string;
+		version_preference?: string;
+		preferences?: Record<string, unknown>;
+	},
 ) {
 	const updates: Record<string, unknown> = { updatedAt: new Date() };
 	if (prefs.language !== undefined) updates.language = prefs.language;
-	if (prefs.version_preference !== undefined) updates.versionPreference = prefs.version_preference;
+	if (prefs.version_preference !== undefined)
+		updates.versionPreference = prefs.version_preference;
 	if (prefs.preferences !== undefined) updates.preferences = prefs.preferences;
 
 	await db.update(users).set(updates).where(eq(users.id, userId));

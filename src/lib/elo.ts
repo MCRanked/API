@@ -129,10 +129,8 @@ export function calculateElo(input: EloInput): EloResult {
 	const divisor = config.elo.base_divisor;
 
 	// Expected scores
-	const winnerExpected =
-		1 / (1 + 10 ** ((loserElo - winnerElo) / divisor));
-	const loserExpected =
-		1 / (1 + 10 ** ((winnerElo - loserElo) / divisor));
+	const winnerExpected = 1 / (1 + 10 ** ((loserElo - winnerElo) / divisor));
+	const loserExpected = 1 / (1 + 10 ** ((winnerElo - loserElo) / divisor));
 
 	// K factors (can differ per player)
 	const winnerK = getKFactor(winnerGamesPlayed, config);

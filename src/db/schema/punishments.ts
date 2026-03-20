@@ -1,12 +1,12 @@
 import {
-	pgTable,
-	serial,
-	uuid,
-	varchar,
-	text,
-	timestamp,
 	boolean,
 	index,
+	pgTable,
+	serial,
+	text,
+	timestamp,
+	uuid,
+	varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
@@ -26,7 +26,5 @@ export const punishments = pgTable(
 		revokedReason: text("revoked_reason"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(table) => [
-		index("punishments_user_idx").on(table.userId, table.revoked),
-	],
+	(table) => [index("punishments_user_idx").on(table.userId, table.revoked)],
 );

@@ -1,15 +1,15 @@
 import { Elysia, t } from "elysia";
+import {
+	exchangeCodeForProfile,
+	getAuthorizationUrl,
+} from "../../lib/microsoft-auth";
+import { verifyMinecraftToken } from "../../lib/minecraft-auth";
 import { authGuard } from "../../middleware/auth";
 import { ApiError } from "../../middleware/error";
 import {
-	getAuthorizationUrl,
-	exchangeCodeForProfile,
-} from "../../lib/microsoft-auth";
-import { verifyMinecraftToken } from "../../lib/minecraft-auth";
-import {
 	authenticateMinecraftProfile,
-	refreshSession,
 	logout,
+	refreshSession,
 } from "./service";
 
 export const authRoutes = new Elysia({ prefix: "/auth" })
@@ -60,7 +60,9 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
 	.post(
 		"/refresh",
 		async ({ body, cookie }) => {
-			const token = body.refresh_token ?? cookie.refresh_token?.value;
+			const token =
+				body.refresh_token ??
+				(cookie.refresh_token?.value as string | undefined);
 			if (!token) {
 				throw new ApiError(401, "UNAUTHORIZED", "No refresh token provided");
 			}

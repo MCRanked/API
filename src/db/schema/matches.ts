@@ -1,18 +1,18 @@
-import {
-	pgTable,
-	uuid,
-	integer,
-	real,
-	varchar,
-	jsonb,
-	timestamp,
-	index,
-	check,
-} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { users } from "./users";
+import {
+	check,
+	index,
+	integer,
+	jsonb,
+	pgTable,
+	real,
+	timestamp,
+	uuid,
+	varchar,
+} from "drizzle-orm/pg-core";
 import { kits } from "./kits";
 import { seasons } from "./seasons";
+import { users } from "./users";
 
 export const matches = pgTable(
 	"matches",

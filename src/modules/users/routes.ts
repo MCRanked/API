@@ -1,16 +1,16 @@
 import { Elysia, t } from "elysia";
 import { authGuard } from "../../middleware/auth";
-import {
-	getUserByUuid,
-	getUserById,
-	updatePreferences,
-	getUserRatings,
-	getLoadouts,
-	saveLoadout,
-	deleteLoadout,
-} from "./service";
 import { ApiError } from "../../middleware/error";
 import { getUserMatches } from "../matches/service";
+import {
+	deleteLoadout,
+	getLoadouts,
+	getUserById,
+	getUserByUuid,
+	getUserRatings,
+	saveLoadout,
+	updatePreferences,
+} from "./service";
 
 export const usersRoutes = new Elysia({ prefix: "/users" })
 	// Public routes
@@ -27,7 +27,8 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
 		"/:uuid/ratings",
 		async ({ params }) => {
 			const result = await getUserRatings(params.uuid);
-			if (result === null) throw new ApiError(404, "NOT_FOUND", "User not found");
+			if (result === null)
+				throw new ApiError(404, "NOT_FOUND", "User not found");
 			return result;
 		},
 		{ params: t.Object({ uuid: t.String() }) },
@@ -36,8 +37,13 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
 		"/:uuid/matches",
 		async ({ params, query }) => {
 			const limit = Math.min(Number(query.limit) || 20, 100);
-			const result = await getUserMatches(params.uuid, limit, query.cursor ?? null);
-			if (result === null) throw new ApiError(404, "NOT_FOUND", "User not found");
+			const result = await getUserMatches(
+				params.uuid,
+				limit,
+				query.cursor ?? null,
+			);
+			if (result === null)
+				throw new ApiError(404, "NOT_FOUND", "User not found");
 			return result;
 		},
 		{

@@ -3,7 +3,7 @@ import { config } from "../config";
 
 const secret = new TextEncoder().encode(config.jwtSecret);
 
-interface AccessTokenPayload {
+export interface AccessTokenPayload extends jose.JWTPayload {
 	sub: string;
 	minecraft_uuid: string;
 	username: string;
@@ -21,9 +21,9 @@ export async function signAccessToken(
 
 export async function verifyAccessToken(
 	token: string,
-): Promise<AccessTokenPayload & jose.JWTPayload> {
+): Promise<AccessTokenPayload> {
 	const { payload } = await jose.jwtVerify(token, secret);
-	return payload as AccessTokenPayload & jose.JWTPayload;
+	return payload as AccessTokenPayload;
 }
 
 export function generateRefreshToken(): string {

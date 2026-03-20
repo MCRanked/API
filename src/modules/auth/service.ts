@@ -1,14 +1,14 @@
 import { eq } from "drizzle-orm";
+import { config } from "../../config";
 import { db } from "../../db";
 import { users } from "../../db/schema";
-import { config } from "../../config";
 import {
-	signAccessToken,
 	generateRefreshToken,
 	hashRefreshToken,
+	signAccessToken,
 } from "../../lib/jwt";
-import { ApiError } from "../../middleware/error";
 import type { MinecraftProfile } from "../../lib/microsoft-auth";
+import { ApiError } from "../../middleware/error";
 
 function formatUuid(raw: string): string {
 	// Minecraft UUIDs come without dashes, normalize to dashed format

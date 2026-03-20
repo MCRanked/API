@@ -1,999 +1,940 @@
 {
-  "id": "c0d13c53-9359-4df5-8566-b96f672dd488",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.kits": {
-      "name": "kits",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "slug": {
-          "name": "slug",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "version_range": {
-          "name": "version_range",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ruleset": {
-          "name": "ruleset",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "default_inventory": {
-          "name": "default_inventory",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "allow_custom_loadouts": {
-          "name": "allow_custom_loadouts",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "icon": {
-          "name": "icon",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "category": {
-          "name": "category",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "display_order": {
-          "name": "display_order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "active": {
-          "name": "active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "kits_slug_unique": {
-          "name": "kits_slug_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.matches": {
-      "name": "matches",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "kit_id": {
-          "name": "kit_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "season_id": {
-          "name": "season_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "winner_id": {
-          "name": "winner_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "loser_id": {
-          "name": "loser_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "winner_elo_before": {
-          "name": "winner_elo_before",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "winner_elo_after": {
-          "name": "winner_elo_after",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "loser_elo_before": {
-          "name": "loser_elo_before",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "loser_elo_after": {
-          "name": "loser_elo_after",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "winner_elo_delta": {
-          "name": "winner_elo_delta",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "loser_elo_delta": {
-          "name": "loser_elo_delta",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "decisiveness_score": {
-          "name": "decisiveness_score",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "integrity_score": {
-          "name": "integrity_score",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "region": {
-          "name": "region",
-          "type": "varchar(16)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "node_id": {
-          "name": "node_id",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "duration_ms": {
-          "name": "duration_ms",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(16)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "played_at": {
-          "name": "played_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "matches_winner_idx": {
-          "name": "matches_winner_idx",
-          "columns": [
-            {
-              "expression": "winner_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "played_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "matches_loser_idx": {
-          "name": "matches_loser_idx",
-          "columns": [
-            {
-              "expression": "loser_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "played_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "matches_kit_season_idx": {
-          "name": "matches_kit_season_idx",
-          "columns": [
-            {
-              "expression": "kit_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "season_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "played_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "matches_kit_id_kits_id_fk": {
-          "name": "matches_kit_id_kits_id_fk",
-          "tableFrom": "matches",
-          "tableTo": "kits",
-          "columnsFrom": [
-            "kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "matches_season_id_seasons_id_fk": {
-          "name": "matches_season_id_seasons_id_fk",
-          "tableFrom": "matches",
-          "tableTo": "seasons",
-          "columnsFrom": [
-            "season_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "matches_winner_id_users_id_fk": {
-          "name": "matches_winner_id_users_id_fk",
-          "tableFrom": "matches",
-          "tableTo": "users",
-          "columnsFrom": [
-            "winner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "matches_loser_id_users_id_fk": {
-          "name": "matches_loser_id_users_id_fk",
-          "tableFrom": "matches",
-          "tableTo": "users",
-          "columnsFrom": [
-            "loser_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "decisiveness_score_range": {
-          "name": "decisiveness_score_range",
-          "value": "\"matches\".\"decisiveness_score\" >= 0 AND \"matches\".\"decisiveness_score\" <= 1"
-        },
-        "integrity_score_range": {
-          "name": "integrity_score_range",
-          "value": "\"matches\".\"integrity_score\" >= 0 AND \"matches\".\"integrity_score\" <= 1"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.player_loadouts": {
-      "name": "player_loadouts",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "kit_id": {
-          "name": "kit_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'default'"
-        },
-        "inventory": {
-          "name": "inventory",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "is_default": {
-          "name": "is_default",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "loadouts_user_kit_idx": {
-          "name": "loadouts_user_kit_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "kit_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "player_loadouts_user_id_users_id_fk": {
-          "name": "player_loadouts_user_id_users_id_fk",
-          "tableFrom": "player_loadouts",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "player_loadouts_kit_id_kits_id_fk": {
-          "name": "player_loadouts_kit_id_kits_id_fk",
-          "tableFrom": "player_loadouts",
-          "tableTo": "kits",
-          "columnsFrom": [
-            "kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "player_loadouts_user_id_kit_id_name_unique": {
-          "name": "player_loadouts_user_id_kit_id_name_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "kit_id",
-            "name"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.punishments": {
-      "name": "punishments",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "varchar(16)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "reason": {
-          "name": "reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "evidence_ref": {
-          "name": "evidence_ref",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "issued_by": {
-          "name": "issued_by",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "revoked": {
-          "name": "revoked",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "revoked_reason": {
-          "name": "revoked_reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "punishments_user_idx": {
-          "name": "punishments_user_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "revoked",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "punishments_user_id_users_id_fk": {
-          "name": "punishments_user_id_users_id_fk",
-          "tableFrom": "punishments",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.ratings": {
-      "name": "ratings",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "kit_id": {
-          "name": "kit_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "season_id": {
-          "name": "season_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "elo": {
-          "name": "elo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "peak_elo": {
-          "name": "peak_elo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "rank": {
-          "name": "rank",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "games_played": {
-          "name": "games_played",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "wins": {
-          "name": "wins",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "losses": {
-          "name": "losses",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "win_streak": {
-          "name": "win_streak",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "best_win_streak": {
-          "name": "best_win_streak",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "placement_done": {
-          "name": "placement_done",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "ratings_leaderboard_idx": {
-          "name": "ratings_leaderboard_idx",
-          "columns": [
-            {
-              "expression": "kit_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "season_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "elo",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "ratings_user_id_users_id_fk": {
-          "name": "ratings_user_id_users_id_fk",
-          "tableFrom": "ratings",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "ratings_kit_id_kits_id_fk": {
-          "name": "ratings_kit_id_kits_id_fk",
-          "tableFrom": "ratings",
-          "tableTo": "kits",
-          "columnsFrom": [
-            "kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "ratings_season_id_seasons_id_fk": {
-          "name": "ratings_season_id_seasons_id_fk",
-          "tableFrom": "ratings",
-          "tableTo": "seasons",
-          "columnsFrom": [
-            "season_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "ratings_user_id_kit_id_season_id_unique": {
-          "name": "ratings_user_id_kit_id_season_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "kit_id",
-            "season_id"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.seasons": {
-      "name": "seasons",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "kit_id": {
-          "name": "kit_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "number": {
-          "name": "number",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "starts_at": {
-          "name": "starts_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ends_at": {
-          "name": "ends_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "active": {
-          "name": "active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "config": {
-          "name": "config",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "seasons_kit_id_kits_id_fk": {
-          "name": "seasons_kit_id_kits_id_fk",
-          "tableFrom": "seasons",
-          "tableTo": "kits",
-          "columnsFrom": [
-            "kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "seasons_kit_id_number_unique": {
-          "name": "seasons_kit_id_number_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "kit_id",
-            "number"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "minecraft_uuid": {
-          "name": "minecraft_uuid",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "username": {
-          "name": "username",
-          "type": "varchar(16)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "microsoft_id": {
-          "name": "microsoft_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "refresh_token": {
-          "name": "refresh_token",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "version_preference": {
-          "name": "version_preference",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'1.8'"
-        },
-        "language": {
-          "name": "language",
-          "type": "varchar(8)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'en'"
-        },
-        "preferences": {
-          "name": "preferences",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::jsonb"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "last_seen_at": {
-          "name": "last_seen_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_minecraft_uuid_unique": {
-          "name": "users_minecraft_uuid_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "minecraft_uuid"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    }
-  },
-  "enums": {},
-  "schemas": {},
-  "sequences": {},
-  "roles": {},
-  "policies": {},
-  "views": {},
-  "_meta": {
-    "columns": {},
-    "schemas": {},
-    "tables": {}
-  }
+	"id": "c0d13c53-9359-4df5-8566-b96f672dd488",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.kits": {
+			"name": "kits",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"slug": {
+					"name": "slug",
+					"type": "varchar(32)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"version_range": {
+					"name": "version_range",
+					"type": "varchar(32)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"ruleset": {
+					"name": "ruleset",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"default_inventory": {
+					"name": "default_inventory",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"allow_custom_loadouts": {
+					"name": "allow_custom_loadouts",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": false
+				},
+				"icon": {
+					"name": "icon",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"category": {
+					"name": "category",
+					"type": "varchar(32)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"display_order": {
+					"name": "display_order",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"active": {
+					"name": "active",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"kits_slug_unique": {
+					"name": "kits_slug_unique",
+					"nullsNotDistinct": false,
+					"columns": ["slug"]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.matches": {
+			"name": "matches",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"kit_id": {
+					"name": "kit_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"season_id": {
+					"name": "season_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"winner_id": {
+					"name": "winner_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"loser_id": {
+					"name": "loser_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"winner_elo_before": {
+					"name": "winner_elo_before",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"winner_elo_after": {
+					"name": "winner_elo_after",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"loser_elo_before": {
+					"name": "loser_elo_before",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"loser_elo_after": {
+					"name": "loser_elo_after",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"winner_elo_delta": {
+					"name": "winner_elo_delta",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"loser_elo_delta": {
+					"name": "loser_elo_delta",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"decisiveness_score": {
+					"name": "decisiveness_score",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"integrity_score": {
+					"name": "integrity_score",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"region": {
+					"name": "region",
+					"type": "varchar(16)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"node_id": {
+					"name": "node_id",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"duration_ms": {
+					"name": "duration_ms",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"metadata": {
+					"name": "metadata",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(16)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"played_at": {
+					"name": "played_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"matches_winner_idx": {
+					"name": "matches_winner_idx",
+					"columns": [
+						{
+							"expression": "winner_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "played_at",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"matches_loser_idx": {
+					"name": "matches_loser_idx",
+					"columns": [
+						{
+							"expression": "loser_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "played_at",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"matches_kit_season_idx": {
+					"name": "matches_kit_season_idx",
+					"columns": [
+						{
+							"expression": "kit_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "season_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "played_at",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"matches_kit_id_kits_id_fk": {
+					"name": "matches_kit_id_kits_id_fk",
+					"tableFrom": "matches",
+					"tableTo": "kits",
+					"columnsFrom": ["kit_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"matches_season_id_seasons_id_fk": {
+					"name": "matches_season_id_seasons_id_fk",
+					"tableFrom": "matches",
+					"tableTo": "seasons",
+					"columnsFrom": ["season_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"matches_winner_id_users_id_fk": {
+					"name": "matches_winner_id_users_id_fk",
+					"tableFrom": "matches",
+					"tableTo": "users",
+					"columnsFrom": ["winner_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"matches_loser_id_users_id_fk": {
+					"name": "matches_loser_id_users_id_fk",
+					"tableFrom": "matches",
+					"tableTo": "users",
+					"columnsFrom": ["loser_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {
+				"decisiveness_score_range": {
+					"name": "decisiveness_score_range",
+					"value": "\"matches\".\"decisiveness_score\" >= 0 AND \"matches\".\"decisiveness_score\" <= 1"
+				},
+				"integrity_score_range": {
+					"name": "integrity_score_range",
+					"value": "\"matches\".\"integrity_score\" >= 0 AND \"matches\".\"integrity_score\" <= 1"
+				}
+			},
+			"isRLSEnabled": false
+		},
+		"public.player_loadouts": {
+			"name": "player_loadouts",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"kit_id": {
+					"name": "kit_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(32)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'default'"
+				},
+				"inventory": {
+					"name": "inventory",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"is_default": {
+					"name": "is_default",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"loadouts_user_kit_idx": {
+					"name": "loadouts_user_kit_idx",
+					"columns": [
+						{
+							"expression": "user_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "kit_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"player_loadouts_user_id_users_id_fk": {
+					"name": "player_loadouts_user_id_users_id_fk",
+					"tableFrom": "player_loadouts",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"player_loadouts_kit_id_kits_id_fk": {
+					"name": "player_loadouts_kit_id_kits_id_fk",
+					"tableFrom": "player_loadouts",
+					"tableTo": "kits",
+					"columnsFrom": ["kit_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"player_loadouts_user_id_kit_id_name_unique": {
+					"name": "player_loadouts_user_id_kit_id_name_unique",
+					"nullsNotDistinct": false,
+					"columns": ["user_id", "kit_id", "name"]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.punishments": {
+			"name": "punishments",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"type": {
+					"name": "type",
+					"type": "varchar(16)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"reason": {
+					"name": "reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"evidence_ref": {
+					"name": "evidence_ref",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"issued_by": {
+					"name": "issued_by",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"revoked": {
+					"name": "revoked",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"revoked_reason": {
+					"name": "revoked_reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"punishments_user_idx": {
+					"name": "punishments_user_idx",
+					"columns": [
+						{
+							"expression": "user_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "revoked",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"punishments_user_id_users_id_fk": {
+					"name": "punishments_user_id_users_id_fk",
+					"tableFrom": "punishments",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.ratings": {
+			"name": "ratings",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"kit_id": {
+					"name": "kit_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"season_id": {
+					"name": "season_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"elo": {
+					"name": "elo",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"peak_elo": {
+					"name": "peak_elo",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"rank": {
+					"name": "rank",
+					"type": "varchar(32)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"games_played": {
+					"name": "games_played",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"wins": {
+					"name": "wins",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"losses": {
+					"name": "losses",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"win_streak": {
+					"name": "win_streak",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"best_win_streak": {
+					"name": "best_win_streak",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"placement_done": {
+					"name": "placement_done",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"ratings_leaderboard_idx": {
+					"name": "ratings_leaderboard_idx",
+					"columns": [
+						{
+							"expression": "kit_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "season_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "elo",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"ratings_user_id_users_id_fk": {
+					"name": "ratings_user_id_users_id_fk",
+					"tableFrom": "ratings",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"ratings_kit_id_kits_id_fk": {
+					"name": "ratings_kit_id_kits_id_fk",
+					"tableFrom": "ratings",
+					"tableTo": "kits",
+					"columnsFrom": ["kit_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"ratings_season_id_seasons_id_fk": {
+					"name": "ratings_season_id_seasons_id_fk",
+					"tableFrom": "ratings",
+					"tableTo": "seasons",
+					"columnsFrom": ["season_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"ratings_user_id_kit_id_season_id_unique": {
+					"name": "ratings_user_id_kit_id_season_id_unique",
+					"nullsNotDistinct": false,
+					"columns": ["user_id", "kit_id", "season_id"]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.seasons": {
+			"name": "seasons",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"kit_id": {
+					"name": "kit_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"number": {
+					"name": "number",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"starts_at": {
+					"name": "starts_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"ends_at": {
+					"name": "ends_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"active": {
+					"name": "active",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": false
+				},
+				"config": {
+					"name": "config",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"seasons_kit_id_kits_id_fk": {
+					"name": "seasons_kit_id_kits_id_fk",
+					"tableFrom": "seasons",
+					"tableTo": "kits",
+					"columnsFrom": ["kit_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"seasons_kit_id_number_unique": {
+					"name": "seasons_kit_id_number_unique",
+					"nullsNotDistinct": false,
+					"columns": ["kit_id", "number"]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.users": {
+			"name": "users",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"minecraft_uuid": {
+					"name": "minecraft_uuid",
+					"type": "varchar(36)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"username": {
+					"name": "username",
+					"type": "varchar(16)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"microsoft_id": {
+					"name": "microsoft_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"refresh_token": {
+					"name": "refresh_token",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"version_preference": {
+					"name": "version_preference",
+					"type": "varchar(32)",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "'1.8'"
+				},
+				"language": {
+					"name": "language",
+					"type": "varchar(8)",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "'en'"
+				},
+				"preferences": {
+					"name": "preferences",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "'{}'::jsonb"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"last_seen_at": {
+					"name": "last_seen_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"users_minecraft_uuid_unique": {
+					"name": "users_minecraft_uuid_unique",
+					"nullsNotDistinct": false,
+					"columns": ["minecraft_uuid"]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		}
+	},
+	"enums": {},
+	"schemas": {},
+	"sequences": {},
+	"roles": {},
+	"policies": {},
+	"views": {},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
 }

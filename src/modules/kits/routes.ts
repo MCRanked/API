@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { listActiveKits, getKitBySlug } from "./service";
 import { ApiError } from "../../middleware/error";
+import { getKitBySlug, listActiveKits } from "./service";
 
 export const kitsRoutes = new Elysia({ prefix: "/kits" })
 	.get("/", () => listActiveKits())

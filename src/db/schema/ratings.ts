@@ -1,17 +1,17 @@
 import {
+	boolean,
+	index,
+	integer,
 	pgTable,
 	serial,
-	uuid,
-	integer,
-	varchar,
-	boolean,
 	timestamp,
 	unique,
-	index,
+	uuid,
+	varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
 import { kits } from "./kits";
 import { seasons } from "./seasons";
+import { users } from "./users";
 
 export const ratings = pgTable(
 	"ratings",

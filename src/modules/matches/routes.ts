@@ -1,14 +1,13 @@
 import { Elysia, t } from "elysia";
-import { getMatchById, getRecentMatches } from "./service";
 import { ApiError } from "../../middleware/error";
+import { getMatchById, getRecentMatches } from "./service";
 
 export const matchesRoutes = new Elysia({ prefix: "/matches" })
 	.get(
 		"/:id",
 		async ({ params }) => {
 			const match = await getMatchById(params.id);
-			if (!match)
-				throw new ApiError(404, "NOT_FOUND", "Match not found");
+			if (!match) throw new ApiError(404, "NOT_FOUND", "Match not found");
 			return match;
 		},
 		{ params: t.Object({ id: t.String() }) },

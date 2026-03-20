@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Elysia } from "elysia";
-import { errorHandler, ApiError } from "../../src/middleware/error";
+import { ApiError, errorHandler } from "../../src/middleware/error";
 
 describe("errorHandler", () => {
 	const app = new Elysia()
@@ -33,9 +33,7 @@ describe("errorHandler", () => {
 	});
 
 	test("formats unknown errors as 500", async () => {
-		const res = await app.handle(
-			new Request("http://localhost/unknown-error"),
-		);
+		const res = await app.handle(new Request("http://localhost/unknown-error"));
 		expect(res.status).toBe(500);
 		const body = await res.json();
 		expect(body.code).toBe("INTERNAL_ERROR");

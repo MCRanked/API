@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { encodeCursor, decodeCursor, paginatedResponse } from "../../src/lib/pagination";
+import {
+	decodeCursor,
+	encodeCursor,
+	paginatedResponse,
+} from "../../src/lib/pagination";
 
 describe("cursor pagination", () => {
 	test("encodeCursor produces base64 string", () => {

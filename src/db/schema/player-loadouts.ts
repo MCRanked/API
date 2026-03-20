@@ -1,17 +1,17 @@
 import {
+	boolean,
+	index,
+	integer,
+	jsonb,
 	pgTable,
 	serial,
-	uuid,
-	integer,
-	varchar,
-	jsonb,
-	boolean,
 	timestamp,
 	unique,
-	index,
+	uuid,
+	varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
 import { kits } from "./kits";
+import { users } from "./users";
 
 export const playerLoadouts = pgTable(
 	"player_loadouts",

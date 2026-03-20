@@ -8,11 +8,11 @@ interface RateLimitOptions {
 export function rateLimiter(options: RateLimitOptions) {
 	const store = new Map<string, { count: number; resetAt: number }>();
 
-	return new Elysia({ name: "rate-limiter" })
-		.onBeforeHandle({ as: "global" }, ({ set, request }) => {
+	return new Elysia({ name: "rate-limiter" }).onBeforeHandle(
+		{ as: "global" },
+		({ set, request }) => {
 			const ip =
-				request.headers.get("x-forwarded-for")?.split(",")[0] ??
-				"unknown";
+				request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
 			const now = Date.now();
 			const key = ip;
 
@@ -40,5 +40,6 @@ export function rateLimiter(options: RateLimitOptions) {
 					details: {},
 				};
 			}
-		});
+		},
+	);
 }

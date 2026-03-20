@@ -2,8 +2,8 @@ import { Elysia } from "elysia";
 import { verifyAccessToken } from "../lib/jwt";
 import { ApiError } from "./error";
 
-export const authGuard = new Elysia({ name: "auth-guard" }).derive(
-	async ({ headers }) => {
+export const authGuard = new Elysia({ name: "auth-guard" })
+	.derive(async ({ headers }) => {
 		const authorization = headers.authorization;
 		if (!authorization?.startsWith("Bearer ")) {
 			throw new ApiError(
@@ -20,5 +20,5 @@ export const authGuard = new Elysia({ name: "auth-guard" }).derive(
 		} catch {
 			throw new ApiError(401, "UNAUTHORIZED", "Invalid or expired token");
 		}
-	},
-).as("plugin");
+	})
+	.as("scoped");

@@ -1,57 +1,46 @@
+import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
+import { db } from "../../db";
+import { kits, seasons } from "../../db/schema";
 import { apiKeyGuard } from "../../middleware/apiKey";
 import {
-	submitMatch,
-	voidMatch,
+	checkSessionValid,
+	getActiveLoadout,
+	getActivePunishments,
 	issuePunishment,
 	revokePunishment,
-	checkSessionValid,
-	getActivePunishments,
-	getActiveLoadout,
+	submitMatch,
+	voidMatch,
 } from "./service";
-import { db } from "../../db";
-import { seasons, kits } from "../../db/schema";
-import { eq } from "drizzle-orm";
-import { ApiError } from "../../middleware/error";
 
 export const internalRoutes = new Elysia({ prefix: "/internal/v1" })
 	.use(apiKeyGuard)
-	.post(
-		"/matches",
-		async ({ body }) => submitMatch(body),
-		{
-			body: t.Object({
-				kit_id: t.Number(),
-				winner_minecraft_uuid: t.String(),
-				loser_minecraft_uuid: t.String(),
-				region: t.String(),
-				node_id: t.String(),
-				duration_ms: t.Number(),
-				decisiveness_score: t.Number({ minimum: 0, maximum: 1 }),
-				integrity_score: t.Number({ minimum: 0, maximum: 1 }),
-				metadata: t.Optional(t.Record(t.String(), t.Unknown())),
-			}),
-		},
-	)
-	.post(
-		"/matches/:id/void",
-		async ({ params }) => voidMatch(params.id),
-		{ params: t.Object({ id: t.String() }) },
-	)
-	.post(
-		"/punishments",
-		async ({ body }) => issuePunishment(body),
-		{
-			body: t.Object({
-				minecraft_uuid: t.String(),
-				type: t.String(),
-				reason: t.String(),
-				evidence_ref: t.Optional(t.String()),
-				issued_by: t.String(),
-				expires_at: t.Optional(t.String()),
-			}),
-		},
-	)
+	.post("/matches", async ({ body }) => submitMatch(body), {
+		body: t.Object({
+			kit_id: t.Number(),
+			winner_minecraft_uuid: t.String(),
+			loser_minecraft_uuid: t.String(),
+			region: t.String(),
+			node_id: t.String(),
+			duration_ms: t.Number(),
+			decisiveness_score: t.Number({ minimum: 0, maximum: 1 }),
+			integrity_score: t.Number({ minimum: 0, maximum: 1 }),
+			metadata: t.Optional(t.Record(t.String(), t.Unknown())),
+		}),
+	})
+	.post("/matches/:id/void", async ({ params }) => voidMatch(params.id), {
+		params: t.Object({ id: t.String() }),
+	})
+	.post("/punishments", async ({ body }) => issuePunishment(body), {
+		body: t.Object({
+			minecraft_uuid: t.String(),
+			type: t.String(),
+			reason: t.String(),
+			evidence_ref: t.Optional(t.String()),
+			issued_by: t.String(),
+			expires_at: t.Optional(t.String()),
+		}),
+	})
 	.delete(
 		"/punishments/:id",
 		async ({ params }) => revokePunishment(Number(params.id)),
@@ -165,14 +154,13 @@ export const internalRoutes = new Elysia({ prefix: "/internal/v1" })
 			};
 			if (body.name !== undefined) updates.name = body.name;
 			if (body.ruleset !== undefined) updates.ruleset = body.ruleset;
-			if (body.default_inventory !== undefined) updates.defaultInventory = body.default_inventory;
+			if (body.default_inventory !== undefined)
+				updates.defaultInventory = body.default_inventory;
 			if (body.active !== undefined) updates.active = body.active;
-			if (body.allow_custom_loadouts !== undefined) updates.allowCustomLoadouts = body.allow_custom_loadouts;
+			if (body.allow_custom_loadouts !== undefined)
+				updates.allowCustomLoadouts = body.allow_custom_loadouts;
 
-			await db
-				.update(kits)
-				.set(updates)
-				.where(eq(kits.slug, params.slug));
+			await db.update(kits).set(updates).where(eq(kits.slug, params.slug));
 			return { success: true };
 		},
 		{

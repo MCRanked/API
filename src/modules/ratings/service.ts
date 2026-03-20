@@ -1,7 +1,11 @@
-import { eq, and, desc, lt, or } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 import { db } from "../../db";
-import { ratings, kits, seasons, users } from "../../db/schema";
-import { decodeCursor, encodeCursor, paginatedResponse } from "../../lib/pagination";
+import { kits, ratings, seasons, users } from "../../db/schema";
+import {
+	decodeCursor,
+	encodeCursor,
+	paginatedResponse,
+} from "../../lib/pagination";
 
 export async function getLeaderboard(
 	kitSlug: string,

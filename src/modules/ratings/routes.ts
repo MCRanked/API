@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { getLeaderboard, getUserRating } from "./service";
 import { ApiError } from "../../middleware/error";
+import { getLeaderboard, getUserRating } from "./service";
 
 export const ratingsRoutes = new Elysia({ prefix: "/ratings" })
 	.get(
@@ -28,8 +28,7 @@ export const ratingsRoutes = new Elysia({ prefix: "/ratings" })
 		"/:uuid/:kitSlug",
 		async ({ params }) => {
 			const rating = await getUserRating(params.uuid, params.kitSlug);
-			if (!rating)
-				throw new ApiError(404, "NOT_FOUND", "Rating not found");
+			if (!rating) throw new ApiError(404, "NOT_FOUND", "Rating not found");
 			return rating;
 		},
 		{

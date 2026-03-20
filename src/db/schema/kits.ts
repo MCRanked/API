@@ -1,12 +1,12 @@
 import {
-	pgTable,
-	serial,
-	varchar,
-	text,
-	jsonb,
 	boolean,
 	integer,
+	jsonb,
+	pgTable,
+	serial,
+	text,
 	timestamp,
+	varchar,
 } from "drizzle-orm/pg-core";
 
 export const kits = pgTable("kits", {

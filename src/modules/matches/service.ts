@@ -1,7 +1,11 @@
-import { eq, desc, or, and, lt } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 import { db } from "../../db";
 import { matches, users } from "../../db/schema";
-import { encodeCursor, decodeCursor, paginatedResponse } from "../../lib/pagination";
+import {
+	decodeCursor,
+	encodeCursor,
+	paginatedResponse,
+} from "../../lib/pagination";
 
 export async function getMatchById(id: string) {
 	return db.query.matches.findFirst({
@@ -15,7 +19,9 @@ export async function getRecentMatches(limit: number, cursor: string | null) {
 	if (cursor) {
 		const decoded = decodeCursor(cursor);
 		if (decoded?.played_at) {
-			conditions.push(lt(matches.playedAt, new Date(decoded.played_at as string)));
+			conditions.push(
+				lt(matches.playedAt, new Date(decoded.played_at as string)),
+			);
 		}
 	}
 
@@ -41,16 +47,15 @@ export async function getUserMatches(
 	if (!user) return null;
 
 	const conditions = [
-		or(
-			eq(matches.winnerId, user.id),
-			eq(matches.loserId, user.id),
-		)!,
+		or(eq(matches.winnerId, user.id), eq(matches.loserId, user.id))!,
 	];
 
 	if (cursor) {
 		const decoded = decodeCursor(cursor);
 		if (decoded?.played_at) {
-			conditions.push(lt(matches.playedAt, new Date(decoded.played_at as string)));
+			conditions.push(
+				lt(matches.playedAt, new Date(decoded.played_at as string)),
+			);
 		}
 	}
 

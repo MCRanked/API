@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
+import type { SeasonConfig } from "../../src/lib/elo";
 import {
 	calculateElo,
-	getKFactor,
+	deriveRank,
 	getDecisivenessMultiplier,
 	getIntegrityMultiplier,
-	deriveRank,
+	getKFactor,
 } from "../../src/lib/elo";
-import type { SeasonConfig } from "../../src/lib/elo";
 
 const defaultConfig: SeasonConfig = {
 	elo: {
@@ -89,9 +89,7 @@ describe("getDecisivenessMultiplier", () => {
 
 	test("score 0.75 interpolates between mid and max", () => {
 		// halfway between 1.0 and 1.25 = 1.125
-		expect(getDecisivenessMultiplier(0.75, defaultConfig)).toBeCloseTo(
-			1.125,
-		);
+		expect(getDecisivenessMultiplier(0.75, defaultConfig)).toBeCloseTo(1.125);
 	});
 });
 

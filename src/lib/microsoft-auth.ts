@@ -56,7 +56,8 @@ async function getMicrosoftToken(code: string): Promise<string> {
 		}),
 	});
 	const data = await res.json();
-	if (!res.ok) throw new Error(`Microsoft token exchange failed: ${data.error}`);
+	if (!res.ok)
+		throw new Error(`Microsoft token exchange failed: ${data.error}`);
 	return data.access_token;
 }
 

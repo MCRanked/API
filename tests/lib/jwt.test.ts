@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
-	signAccessToken,
-	verifyAccessToken,
 	generateRefreshToken,
 	hashRefreshToken,
+	signAccessToken,
+	verifyAccessToken,
 } from "../../src/lib/jwt";
 
 describe("JWT", () => {

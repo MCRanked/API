@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { Elysia } from "elysia";
+import { signAccessToken } from "../../src/lib/jwt";
 import { authGuard } from "../../src/middleware/auth";
 import { errorHandler } from "../../src/middleware/error";
-import { signAccessToken } from "../../src/lib/jwt";
 
 describe("authGuard", () => {
 	const app = new Elysia()

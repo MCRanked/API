@@ -1,4 +1,4 @@
-import { and, eq, lt, gte } from "drizzle-orm";
+import { and, eq, gte, lt } from "drizzle-orm";
 import { ratings, seasons } from "../db/schema";
 import { deriveRank, type SeasonConfig } from "./elo";
 

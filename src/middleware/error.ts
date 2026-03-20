@@ -11,8 +11,8 @@ export class ApiError extends Error {
 	}
 }
 
-export const errorHandler = new Elysia({ name: "error-handler" }).onError(
-	({ error, set }) => {
+export const errorHandler = new Elysia({ name: "error-handler" })
+	.onError(({ error, set }) => {
 		if (error instanceof ApiError) {
 			set.status = error.status;
 			return {
@@ -29,5 +29,5 @@ export const errorHandler = new Elysia({ name: "error-handler" }).onError(
 			code: "INTERNAL_ERROR",
 			details: {},
 		};
-	},
-).as("plugin");
+	})
+	.as("scoped");

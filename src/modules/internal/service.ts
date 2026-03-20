@@ -1,13 +1,13 @@
-import { eq, and, or, isNull, gt, sql } from "drizzle-orm";
+import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { db } from "../../db";
 import {
-	users,
-	matches,
-	ratings,
 	kits,
-	seasons,
-	punishments,
+	matches,
 	playerLoadouts,
+	punishments,
+	ratings,
+	seasons,
+	users,
 } from "../../db/schema";
 import { calculateElo, deriveRank, type SeasonConfig } from "../../lib/elo";
 import { ApiError } from "../../middleware/error";
@@ -38,10 +38,7 @@ export async function submitMatch(input: MatchSubmission) {
 
 	// Resolve active season for this kit
 	const activeSeason = await db.query.seasons.findFirst({
-		where: and(
-			eq(seasons.kitId, input.kit_id),
-			eq(seasons.active, true),
-		),
+		where: and(eq(seasons.kitId, input.kit_id), eq(seasons.active, true)),
 	});
 	if (!activeSeason) {
 		throw new ApiError(
@@ -84,8 +81,7 @@ export async function submitMatch(input: MatchSubmission) {
 		winnerRating.placementDone ||
 		winnerNewGames >= config.elo.placement_matches;
 	const loserPlacementDone =
-		loserRating.placementDone ||
-		loserNewGames >= config.elo.placement_matches;
+		loserRating.placementDone || loserNewGames >= config.elo.placement_matches;
 
 	const now = new Date();
 

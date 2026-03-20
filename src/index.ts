@@ -1,18 +1,18 @@
-import { Elysia } from "elysia";
-import { swagger } from "@elysiajs/swagger";
 import { cors } from "@elysiajs/cors";
+import { swagger } from "@elysiajs/swagger";
+import { Elysia } from "elysia";
 import { config } from "./config";
+import { runDecay } from "./lib/decay";
 import { errorHandler } from "./middleware/error";
+import { rateLimiter } from "./middleware/rateLimit";
 import { authRoutes } from "./modules/auth/routes";
-import { usersRoutes } from "./modules/users/routes";
+import { internalRoutes } from "./modules/internal/routes";
 import { kitsRoutes } from "./modules/kits/routes";
-import { seasonsRoutes } from "./modules/seasons/routes";
-import { ratingsRoutes } from "./modules/ratings/routes";
 import { matchesRoutes } from "./modules/matches/routes";
 import { punishmentsRoutes } from "./modules/punishments/routes";
-import { internalRoutes } from "./modules/internal/routes";
-import { rateLimiter } from "./middleware/rateLimit";
-import { runDecay } from "./lib/decay";
+import { ratingsRoutes } from "./modules/ratings/routes";
+import { seasonsRoutes } from "./modules/seasons/routes";
+import { usersRoutes } from "./modules/users/routes";
 
 const app = new Elysia()
 	.use(errorHandler)

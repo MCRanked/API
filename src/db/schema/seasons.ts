@@ -1,10 +1,10 @@
 import {
+	boolean,
+	integer,
+	jsonb,
 	pgTable,
 	serial,
-	integer,
 	timestamp,
-	boolean,
-	jsonb,
 	unique,
 } from "drizzle-orm/pg-core";
 import { kits } from "./kits";
