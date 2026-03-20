@@ -3,6 +3,7 @@
 **Date:** 2026-03-20
 **Status:** Approved
 **Scope:** MVP scaffold for the RankedMC API server — application plane for the competitive Minecraft PvP platform.
+**MVP Scope:** 1v1 matches only. Multi-player formats (2v2, FFA) will require a `match_participants` junction table in a future migration.
 
 ## Overview
 
@@ -86,6 +87,64 @@ API/
 └── .env.example
 ```
 
+## Conventions
+
+### Error Response Format
+
+All errors follow a consistent envelope:
+
+```json
+{
+  "error": "Human-readable message",
+  "code": "MACHINE_READABLE_CODE",
+  "details": {}
+}
+```
+
+Notable error codes:
+
+| HTTP Status | Code | When |
+|-------------|------|------|
+| 400 | `VALIDATION_ERROR` | Invalid input, details has field-level errors |
+| 401 | `UNAUTHORIZED` | Missing/invalid JWT or refresh token |
+| 403 | `FORBIDDEN` | Valid auth but insufficient permission (e.g., banned user) |
+| 404 | `NOT_FOUND` | Resource does not exist |
+| 409 | `CONFLICT` | Duplicate (e.g., loadout name already exists) |
+| 429 | `RATE_LIMITED` | Too many requests |
+| 500 | `INTERNAL_ERROR` | Unexpected server error |
+
+### Pagination
+
+All paginated endpoints use cursor-based pagination:
+
+- Query params: `?cursor=<opaque_string>&limit=<int>` (default limit 20, max 100)
+- Response wrapper:
+```json
+{
+  "data": [],
+  "next_cursor": "abc123",
+  "has_more": true
+}
+```
+
+Cursors are opaque base64-encoded values. Clients should not parse them.
+
+### Rate Limiting
+
+- Unauthenticated endpoints: 60 requests/minute per IP
+- Authenticated endpoints: 120 requests/minute per user
+- Internal endpoints: no rate limit (API key auth, trusted caller)
+
+Rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`.
+
+### Session Policy
+
+Single active session per user. Logging in from a new device invalidates the previous refresh token. This is intentional — it simplifies revocation and prevents session sprawl. If multi-device support is needed later, a `sessions` table can replace the single `refresh_token` column on users.
+
+### Refresh Token Hashing
+
+Refresh tokens are 64-byte random hex (512 bits of entropy). SHA-256 is appropriate for hashing high-entropy secrets — bcrypt/argon2 are designed for low-entropy passwords and would add unnecessary latency. The high entropy of the token itself is what provides security.
+
 ## Database Schema
 
 ### users
@@ -97,7 +156,7 @@ API/
 | username | VARCHAR(16) | NOT NULL |
 | microsoft_id | VARCHAR(255) | nullable |
 | refresh_token | VARCHAR(255) | nullable, stored hashed (SHA-256) |
-| version_preference | VARCHAR(10) | DEFAULT '1.8' |
+| version_preference | VARCHAR(32) | DEFAULT '1.8' |
 | language | VARCHAR(8) | DEFAULT 'en' |
 | preferences | JSONB | DEFAULT '{}' |
 | created_at | TIMESTAMP | DEFAULT now() |
@@ -228,8 +287,8 @@ API/
 | user_id | FK → users.id | NOT NULL |
 | kit_id | FK → kits.id | NOT NULL |
 | season_id | FK → seasons.id | NOT NULL |
-| elo | INTEGER | DEFAULT 1000 |
-| peak_elo | INTEGER | DEFAULT 1000 |
+| elo | INTEGER | NOT NULL (set from season config.elo.default_rating) |
+| peak_elo | INTEGER | NOT NULL (initialized to same as elo) |
 | rank | VARCHAR(32) | nullable |
 | games_played | INTEGER | DEFAULT 0 |
 | wins | INTEGER | DEFAULT 0 |
@@ -256,8 +315,8 @@ API/
 | loser_elo_after | INTEGER | nullable |
 | winner_elo_delta | INTEGER | nullable |
 | loser_elo_delta | INTEGER | nullable |
-| decisiveness_score | REAL | 0.0–1.0 |
-| integrity_score | REAL | 0.0–1.0 |
+| decisiveness_score | REAL | NOT NULL, CHECK 0.0–1.0 |
+| integrity_score | REAL | NOT NULL, CHECK 0.0–1.0 |
 | region | VARCHAR(16) | NOT NULL |
 | node_id | VARCHAR(64) | NOT NULL |
 | duration_ms | INTEGER | NOT NULL |
@@ -296,6 +355,18 @@ API/
 | UNIQUE(user_id, kit_id, name) | | |
 
 Loadouts are validated against `kits.ruleset.inventory_rules` on save (API) and on match start (node).
+
+### Key Indexes
+
+| Table | Index | Purpose |
+|-------|-------|---------|
+| ratings | `(kit_id, season_id, elo DESC)` | Leaderboard queries |
+| ratings | `(user_id, kit_id, season_id)` | Unique constraint + user rating lookups |
+| matches | `(winner_id, played_at DESC)` | User match history |
+| matches | `(loser_id, played_at DESC)` | User match history |
+| matches | `(kit_id, season_id, played_at DESC)` | Recent matches by kit |
+| punishments | `(user_id, revoked)` | Active punishment checks |
+| player_loadouts | `(user_id, kit_id)` | Loadout fetches |
 
 ## Auth Flows
 
@@ -366,7 +437,7 @@ Loadouts are validated against `kits.ruleset.inventory_rules` on save (API) and 
 |--------|------|------|-------------|
 | GET | `/users/me/loadouts` | JWT | All loadouts |
 | GET | `/users/me/loadouts/:kitSlug` | JWT | Loadouts for a kit |
-| PUT | `/users/me/loadouts/:kitSlug` | JWT | Create/update loadout |
+| PUT | `/users/me/loadouts/:kitSlug/:name` | JWT | Create/update loadout by name |
 | DELETE | `/users/me/loadouts/:kitSlug/:name` | JWT | Delete loadout |
 
 **Kits:**
@@ -428,17 +499,17 @@ FinalDelta = BaseDelta × DecisivenessMultiplier × IntegrityMultiplier
 ```
 
 - **K-factor:** From `config.elo.k_factors` based on games played
-- **Decisiveness multiplier:** Linear interpolation from 0.0→min_multiplier to 1.0→max_multiplier via mid at 0.5
+- **Decisiveness multiplier:** Piecewise linear — score 0.0 maps to `min_multiplier` (0.80), score 0.5 maps to `mid_multiplier` (1.00), score 1.0 maps to `max_multiplier` (1.25). Linearly interpolate between adjacent points.
 - **Integrity multiplier:** Stepped from `config.elo.integrity` thresholds
-- **Rank derivation:** From `config.ranks` array, first entry where `elo >= min_elo` (descending)
+- **Rank derivation:** Iterate `config.ranks` in descending order; the first entry where `player_elo >= min_elo` determines the rank. If placement is incomplete, rank is "Unranked".
 
 ### Input (from root server)
 
 ```json
 {
   "kit_id": 1,
-  "winner_uuid": "...",
-  "loser_uuid": "...",
+  "winner_minecraft_uuid": "...",
+  "loser_minecraft_uuid": "...",
   "region": "us-east",
   "node_id": "...",
   "duration_ms": 45000,
@@ -466,6 +537,21 @@ FinalDelta = BaseDelta × DecisivenessMultiplier × IntegrityMultiplier
 ```
 
 Node computes `decisiveness_score` and `integrity_score` from raw combat telemetry. API applies them as multipliers. This keeps the Elo engine kit-agnostic — new kits only require node-side changes.
+
+UUIDs in match submissions refer to Minecraft UUIDs (`minecraft_uuid`). The API resolves these to internal user IDs via lookup.
+
+### Season Resolution
+
+When a match is submitted, the API resolves the active season for the given `kit_id`. There must be exactly one active season per kit at any time. If no active season exists for the kit, the match submission is rejected with a `VALIDATION_ERROR`. The resolved `season_id` is used for the rating lookup/update and stored on the match record.
+
+### Decay Execution
+
+Elo decay runs as a daily cron job (or scheduled Bun task). For each active season where `config.decay.enabled` is true:
+
+1. Query ratings where `updated_at < now() - config.decay.inactivity_days` AND `elo >= config.decay.min_elo`
+2. Decrement `elo` by `config.decay.points_per_day`, flooring at `config.decay.floor_elo`
+3. Update `rank` if the new Elo crosses a threshold
+4. Set `updated_at` to now (so decay applies once per day, not compounding)
 
 ## Inventory Validation
 
