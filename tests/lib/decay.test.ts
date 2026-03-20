@@ -1,6 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { decayRating } from "../../src/lib/decay";
-import type { SeasonConfig } from "../../src/lib/elo";
 
 // Note: Full integration testing requires a running DB.
 // This test verifies the decay logic in isolation.

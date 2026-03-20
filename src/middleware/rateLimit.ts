@@ -8,6 +8,13 @@ interface RateLimitOptions {
 export function rateLimiter(options: RateLimitOptions) {
 	const store = new Map<string, { count: number; resetAt: number }>();
 
+	setInterval(() => {
+		const now = Date.now();
+		for (const [key, entry] of store) {
+			if (now > entry.resetAt) store.delete(key);
+		}
+	}, options.windowMs);
+
 	return new Elysia({ name: "rate-limiter" }).onBeforeHandle(
 		{ as: "global" },
 		({ set, request }) => {

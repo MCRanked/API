@@ -20,7 +20,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
 	// Flow A: Web OAuth — callback
 	.get(
 		"/callback",
-		async ({ query, set, cookie }) => {
+		async ({ query, cookie }) => {
 			const profile = await exchangeCodeForProfile(query.code);
 			const result = await authenticateMinecraftProfile(profile);
 			cookie.refresh_token.set({

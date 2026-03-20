@@ -1,4 +1,4 @@
-import { and, desc, eq, lt, or } from "drizzle-orm";
+import { and, desc, eq, lt, or, type SQL } from "drizzle-orm";
 import { db } from "../../db";
 import { matches, users } from "../../db/schema";
 import {
@@ -46,8 +46,8 @@ export async function getUserMatches(
 	});
 	if (!user) return null;
 
-	const conditions = [
-		or(eq(matches.winnerId, user.id), eq(matches.loserId, user.id))!,
+	const conditions: SQL[] = [
+		or(eq(matches.winnerId, user.id), eq(matches.loserId, user.id)) as SQL,
 	];
 
 	if (cursor) {

@@ -186,16 +186,36 @@ export async function voidMatch(matchId: string) {
 	});
 	if (!match) throw new ApiError(404, "NOT_FOUND", "Match not found");
 
+	const season = await db.query.seasons.findFirst({
+		where: eq(seasons.id, match.seasonId),
+	});
+	const seasonConfig = season?.config as SeasonConfig | undefined;
+
 	await db.transaction(async (tx) => {
 		if (match.status === "completed" && match.winnerId && match.loserId) {
 			if (match.winnerEloDelta) {
+				const restoredElo = match.winnerEloBefore as number;
+				const winnerRating = await tx.query.ratings.findFirst({
+					where: and(
+						eq(ratings.userId, match.winnerId),
+						eq(ratings.kitId, match.kitId),
+						eq(ratings.seasonId, match.seasonId),
+					),
+				});
+				const newGamesPlayed = (winnerRating?.gamesPlayed ?? 1) - 1;
+				const placementDone = seasonConfig
+					? newGamesPlayed >= seasonConfig.elo.placement_matches
+					: (winnerRating?.placementDone ?? false);
 				await tx
 					.update(ratings)
 					.set({
-						elo: match.winnerEloBefore!,
+						elo: restoredElo,
 						wins: sql`${ratings.wins} - 1`,
 						gamesPlayed: sql`${ratings.gamesPlayed} - 1`,
-						rank: sql`CASE WHEN ${ratings.placementDone} THEN NULL ELSE 'Unranked' END`,
+						placementDone,
+						rank: seasonConfig
+							? deriveRank(restoredElo, placementDone, seasonConfig)
+							: "Unranked",
 						updatedAt: new Date(),
 					})
 					.where(
@@ -207,13 +227,28 @@ export async function voidMatch(matchId: string) {
 					);
 			}
 			if (match.loserEloDelta) {
+				const restoredElo = match.loserEloBefore as number;
+				const loserRating = await tx.query.ratings.findFirst({
+					where: and(
+						eq(ratings.userId, match.loserId),
+						eq(ratings.kitId, match.kitId),
+						eq(ratings.seasonId, match.seasonId),
+					),
+				});
+				const newGamesPlayed = (loserRating?.gamesPlayed ?? 1) - 1;
+				const placementDone = seasonConfig
+					? newGamesPlayed >= seasonConfig.elo.placement_matches
+					: (loserRating?.placementDone ?? false);
 				await tx
 					.update(ratings)
 					.set({
-						elo: match.loserEloBefore!,
+						elo: restoredElo,
 						losses: sql`${ratings.losses} - 1`,
 						gamesPlayed: sql`${ratings.gamesPlayed} - 1`,
-						rank: sql`CASE WHEN ${ratings.placementDone} THEN NULL ELSE 'Unranked' END`,
+						placementDone,
+						rank: seasonConfig
+							? deriveRank(restoredElo, placementDone, seasonConfig)
+							: "Unranked",
 						updatedAt: new Date(),
 					})
 					.where(

@@ -1,4 +1,4 @@
-import { and, desc, eq, lt, or } from "drizzle-orm";
+import { and, desc, eq, lt, or, type SQL } from "drizzle-orm";
 import { db } from "../../db";
 import { kits, ratings, seasons, users } from "../../db/schema";
 import {
@@ -22,7 +22,7 @@ export async function getLeaderboard(
 	});
 	if (!activeSeason) return { data: [], next_cursor: null, has_more: false };
 
-	const conditions = [
+	const conditions: SQL[] = [
 		eq(ratings.kitId, kit.id),
 		eq(ratings.seasonId, activeSeason.id),
 		eq(ratings.placementDone, true),
@@ -38,14 +38,14 @@ export async function getLeaderboard(
 						eq(ratings.elo, decoded.elo as number),
 						lt(ratings.id, decoded.id as number),
 					),
-				)!,
+				) as SQL,
 			);
 		}
 	}
 
 	const results = await db.query.ratings.findMany({
 		where: and(...conditions),
-		orderBy: desc(ratings.elo),
+		orderBy: [desc(ratings.elo), desc(ratings.id)],
 		limit: limit + 1,
 	});
 
